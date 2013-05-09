@@ -6,6 +6,7 @@
 from sys import argv
 import csv
 import json
+import re
 
 def read_tweets(input_tweet_file):
 	tweets = []
@@ -29,10 +30,13 @@ def calc_sentimentscore(sentiments, tweets):
 		if tweets[i]["user"]["lang"] == "en":
 			tweet = tweets[i]["text"]
 			tweet = tweet.encode('utf-8')
+			tweet = tweet.lower()
+			tweet_words_list = re.findall(r"[\w']+", tweet)
 			for j in range(len(sentiments)):
-				if sentiments[j][0] in tweet:
-					sentiment_value = int(float(sentiments[j][1]))
-					sentiments_sum += sentiment_value
+				for word in tweet_words_list:
+					if sentiments[j][0] == word:
+						sentiment_value = int(float(sentiments[j][1]))
+						sentiments_sum += sentiment_value
 			print tweet, sentiments_sum
 
 if __name__ == '__main__':

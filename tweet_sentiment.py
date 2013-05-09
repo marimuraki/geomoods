@@ -31,7 +31,7 @@ def calc_sentimentscore(sentiments, tweets):
 			tweet = tweet.encode('utf-8')
 			for j in range(len(sentiments)):
 				if sentiments[j][0] in tweet:
-					sentiment_value = int(float(sentiments[i][1]))
+					sentiment_value = int(float(sentiments[j][1]))
 					sentiments_sum += sentiment_value
 			print tweet, sentiments_sum
 

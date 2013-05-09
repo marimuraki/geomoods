@@ -26,13 +26,14 @@ def identify_sentiments(input_sentiment_file):
 def calc_sentimentscore(sentiments, tweets):
 	for i in range(len(tweets)):
 		sentiments_sum = 0
-		tweet = tweets[i]["text"]
-		tweet = tweet.encode('utf-8')
-		for j in range(len(sentiments)):
-			if sentiments[j][0] in tweet:
-				sentiment_value = int(float(sentiments[i][1]))
-				sentiments_sum += sentiment_value
-		print tweet, sentiments_sum
+		if tweets[i]["user"]["lang"] == "en":
+			tweet = tweets[i]["text"]
+			tweet = tweet.encode('utf-8')
+			for j in range(len(sentiments)):
+				if sentiments[j][0] in tweet:
+					sentiment_value = int(float(sentiments[i][1]))
+					sentiments_sum += sentiment_value
+			print tweet, sentiments_sum
 
 if __name__ == '__main__':
 	sentimentsdict = identify_sentiments(argv[1])

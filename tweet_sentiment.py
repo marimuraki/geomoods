@@ -3,6 +3,7 @@
 #  		<sentiment_file> = AFINN-111.txt
 # 		<tweet_file> = output.json
 
+from sys import argv
 import csv
 import json
 
@@ -21,3 +22,19 @@ def identify_sentiments(input_sentiment_file):
 		value = sentiments[i][1]
 		sentiment_dict[key] = value
 	return sentiments
+
+def calc_sentimentscore(sentiments, tweets):
+	for i in range(len(tweets)):
+		sentiments_sum = 0
+		tweet = tweets[i]["text"]
+		tweet = tweet.encode('utf-8')
+		for j in range(len(sentiments)):
+			if sentiments[j][0] in tweet:
+				sentiment_value = int(float(sentiments[i][1]))
+				sentiments_sum += sentiment_value
+		print tweet, sentiments_sum
+
+if __name__ == '__main__':
+	sentimentsdict = identify_sentiments(argv[1])
+	tweetslist = read_tweets(argv[2])
+	calc_sentimentscore(sentimentsdict, tweetslist)

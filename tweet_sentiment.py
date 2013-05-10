@@ -4,6 +4,7 @@
 # 		<tweet_file> = output.json
 
 from sys import argv
+import codecs
 import csv
 import json
 import re
@@ -15,31 +16,39 @@ def read_tweets(input_tweet_file):
 		tweets.append(json.loads(line))
 	return tweets
 
-def identify_sentiments(input_sentiment_file):
+def read_sentiments(input_sentiment_file):
 	sentiments = list(csv.reader(open(input_sentiment_file, 'rb'), delimiter='\t'))
-	sentiment_dict = dict()
-	for i in range(len(sentiments)):
-		key = sentiments[i][0]
-		value = sentiments[i][1]
-		sentiment_dict[key] = value
 	return sentiments
 
-def calc_sentimentscore(sentiments, tweets):
+def parse_tweet(tweets):
+	tweet_list = []
+	tweet_words_list = []
 	for i in range(len(tweets)):
-		sentiments_sum = 0
 		if tweets[i]["user"]["lang"] == "en":
 			tweet = tweets[i]["text"]
 			tweet = tweet.encode('utf-8')
 			tweet = tweet.lower()
-			tweet_words_list = re.findall(r"[\w']+", tweet)
+			tweet_words = re.findall(r"[\w']+", tweet)
+			tweet_words_list.append(tweet_words)
+			tweet_list.append(tweet)
+	return tweet_list, tweet_words_list	
+	
+def calc_sentimentscore(sentiments, tweet_list, tweet_words_list):
+	tweet_score_dict = {}
+	for i in range(len(tweet_words_list)):
+		sentiments_sum = 0
+		for word in tweet_words_list[i]:
 			for j in range(len(sentiments)):
-				for word in tweet_words_list:
-					if sentiments[j][0] == word:
-						sentiment_value = int(float(sentiments[j][1]))
-						sentiments_sum += sentiment_value
-			print tweet, sentiments_sum
+				if sentiments[j][0] == word:
+					sentiment_value = int(float(sentiments[j][1]))
+					sentiments_sum += sentiment_value				
+		tweet_score_dict[tweet_list[i]] = sentiments_sum			
+		print tweet_list[i], sentiments_sum
+	return tweet_score_dict
+		
 
 if __name__ == '__main__':
-	sentimentsdict = identify_sentiments(argv[1])
+	sentimentslist = read_sentiments(argv[1])
 	tweetslist = read_tweets(argv[2])
-	calc_sentimentscore(sentimentsdict, tweetslist)
+	tweet, tweetwords = parse_tweet(tweetslist)
+	calc_sentimentscore(sentimentslist, tweet, tweetwords)

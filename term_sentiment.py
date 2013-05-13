@@ -8,7 +8,6 @@ from sys import argv
 import csv
 import json
 import re
-import shlex
 
 def read_tweets(input_tweet_file):
     json_data = open(input_tweet_file, 'r')
@@ -38,21 +37,15 @@ def calc_sentimentscore(sentiments, tweet_list, tweet_words_list):
     return tweet_dict_list
 
 def list_sentiments(sentiments):
-    sentiment_list = []
-    for i in range(len(sentiments)):
-        sentiment_list.append(sentiments[i][0])
+    sentiment_list = [sentiment[0] for sentiment in sentiments]
     return sentiment_list
     
-def list_terms(tweets, sentiment_list):
+def list_terms(tweet_words_list, sentiment_list):
     term_list = []
-    for i in range(len(tweets)):
-        if tweets[i]["user"]["lang"] == "en":
-            tweet = tweets[i]["text"]
-            tweet = tweet.encode('utf-8')
-            tweet = tweet.lower()
-            for word in shlex.split(tweet):
-                if word not in sentiment_list:
-                    term_list.append(word)
+    for tweet in tweet_words_list:
+        for word in tweet:
+            if word not in sentiment_list:
+                term_list.append(word)
     seen = set()
     seen_add = seen.add
     term_list = [term for term in term_list if term not in seen and not seen_add(term)]
@@ -61,11 +54,11 @@ def list_terms(tweets, sentiment_list):
 def dict_terms(term_list, tweet_dict_list):
     term_dict_list = []
     for term in term_list:
-        for i in range(len(tweet_dict_list)):
-            if term in tweet_dict_list[i]['tweetwords']:
+        for tweet_dict in tweet_dict_list:
+            if term in tweet_dict['tweetwords']:
                 term_dict = {}
                 term_dict["term"] = term
-                term_dict["score"] = tweet_dict_list[i]['score']
+                term_dict["score"] = tweet_dict['score']
                 term_dict_list.append(term_dict)            
     return term_dict_list
 
@@ -73,10 +66,10 @@ def calc_termscore(term_list, term_dict_list):
     for term in term_list:
         score_sum = 0
         count = 0
-        for i in range(len(term_dict_list)):
-            if term_dict_list[i]["term"] == term:
+        for term_dict in term_dict_list:
+            if term_dict["term"] == term:
                 count += 1
-                score_sum += term_dict_list[i]["score"]
+                score_sum += term_dict["score"]
         term_score = score_sum / count
         print term, term_score            
     
@@ -85,7 +78,7 @@ if __name__ == '__main__':
     tweetslist = read_tweets(argv[2])
     tweet, tweetwords = parse_tweet(tweetslist)
     sentlist = list_sentiments(sentimentslist)
-    termlist = list_terms(tweetslist, sentlist)
+    termlist = list_terms(tweetwords, sentlist)
     tweetscores = calc_sentimentscore(sentimentslist, tweet, tweetwords)
     termdict = dict_terms(termlist, tweetscores)
     calc_termscore(termlist, termdict)

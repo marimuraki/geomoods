@@ -25,13 +25,11 @@ def parse_tweet(tweets):
         
 def calc_sentimentscore(sentiments, tweet_list, tweet_words_list):
     tweet_dict_list = []
+    sentiment_dict = dict(sentiments)
     for tweet, tweetwords in zip(tweet_list, tweet_words_list):
         tweet_dict = {}
-        sentiments_sum = 0
-        for word in tweetwords:
-            sentiment_value = [int(float(sentiment[1])) 
-                for sentiment in sentiments if sentiment[0] == word]        
-            sentiments_sum += sum(sentiment_value)                
+        sentiments_sum = sum([int(sentiment_dict.get(word, 0)) 
+            for word in tweetwords])
         tweet_dict["tweet"] = tweet
         tweet_dict["tweetwords"] = tweetwords
         tweet_dict["score"] = sentiments_sum

@@ -41,11 +41,7 @@ def list_sentiments(sentiments):
     return sentiment_list
     
 def list_terms(tweet_words_list, sentiment_list):
-    term_list = []
-    for tweet in tweet_words_list:
-        for word in tweet:
-            if word not in sentiment_list:
-                term_list.append(word)
+    term_list = [word for tweet in tweet_words_list for word in tweet if word not in sentiment_list]
     seen = set()
     seen_add = seen.add
     term_list = [term for term in term_list if term not in seen and not seen_add(term)]
